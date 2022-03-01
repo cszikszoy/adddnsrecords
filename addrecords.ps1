@@ -1,4 +1,3 @@
-
 #!/usr/bin/pwsh
 #
 #   Script to read hosts from excel file or csv and add DNS records
@@ -263,8 +262,11 @@ function lookupAndRemoveOldRecords($name, $zone, $type) {
 try {
     Get-DnsServer -ComputerName $DnsServer | Out-Null
 } catch {
-    Write-Error "Could not connect to $DnsServer"
+    Write-Error "Could not connect to '$DnsServer'."
     Write-Error $_
+    if ($DnsServer) {
+        Write-Error "It looks like we're trying to connect to a remote DNS server. Make sure PowerShell Remoting is enabled by running 'Enable-PSRemoting' on the target."
+    }
     exit
 }
 
