@@ -1,3 +1,4 @@
+
 #!/usr/bin/pwsh
 #
 #   Script to read hosts from excel file or csv and add DNS records
@@ -263,6 +264,7 @@ try {
     Get-DnsServer -ComputerName $DnsServer | Out-Null
 } catch {
     Write-Error "Could not connect to $DnsServer"
+    Write-Error $_
     exit
 }
 
