@@ -1,3 +1,4 @@
+#!/usr/bin/pwsh
 #
 #   Script to read hosts from excel file or csv and add DNS records
 #
