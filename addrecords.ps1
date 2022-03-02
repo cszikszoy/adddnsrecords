@@ -269,7 +269,7 @@ try {
 } catch {
     Write-Error "Could not connect to '$DnsServer'."
     Write-Error $_
-    if ($DnsServer) {
+    if ($DnsServer -ne ".") {
         Write-Error "It looks like we're trying to connect to a remote DNS server. Make sure PowerShell Remoting is enabled by running 'Enable-PSRemoting' on the target."
     }
     exit
