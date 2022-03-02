@@ -12,16 +12,9 @@ Param(
     [Parameter(Mandatory=$TRUE, ParameterSetName="excel")][string] $ExcelRangeNames
 )
 
-# stop execution on any uncaught errors
-$ErrorActionPreference = 'Stop'
-
-# don't run if we're not on PS7
-if ($PSVersionTable.PSVersion.Major -lt 7) {
-    Write-Error "This script requires PowerShell 7 or higher"
-}
-
-# variable to store the hosts to add to DNS
-$hosts = @()
+#
+# functions
+#
 
 # Override the default Write-Error function because the default is... dumb
 function Write-Error($message) {
@@ -257,6 +250,21 @@ function lookupAndRemoveOldRecords($name, $zone, $type) {
     # if we got here we succeeded looking up & removing old records
     return $TRUE
 }
+
+#
+# application begin
+#
+
+# stop execution on any uncaught errors
+$ErrorActionPreference = 'Stop'
+
+# don't run if we're not on PS7
+if ($PSVersionTable.PSVersion.Major -lt 7) {
+    Write-Error "This script requires PowerShell 7 or higher"
+}
+
+# variable to store the hosts to add to DNS
+$hosts = @()
 
 # test connection to $DnsServer
 try {
