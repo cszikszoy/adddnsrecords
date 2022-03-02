@@ -263,9 +263,6 @@ if ($PSVersionTable.PSVersion.Major -lt 7) {
     Write-Error "This script requires PowerShell 7 or higher"
 }
 
-# variable to store the hosts to add to DNS
-$hosts = @()
-
 # test connection to $DnsServer
 try {
     Get-DnsServer -ComputerName $DnsServer | Out-Null
@@ -277,6 +274,9 @@ try {
     }
     exit
 }
+
+# variable to store the hosts to add to DNS
+$hosts = @()
 
 # read input file
 if ($ExcelFile) {
