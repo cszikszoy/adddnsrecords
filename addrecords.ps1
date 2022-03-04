@@ -364,7 +364,7 @@ try {
 }
 
 # variable to store the hosts to add to DNS
-$hosts = @()
+[array] $hosts = @()
 
 # read input file
 if ($ExcelFile) {
@@ -385,8 +385,6 @@ $addedRecords = @{
     ptr = 0
     cname = 0
 }
-
-$($hosts | where {$_.cname}).Count
 
 # foreach host
 foreach ($h in $hosts) {
