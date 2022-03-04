@@ -6,6 +6,10 @@
 Param(
     [switch] $DryRun,
     [string] $DnsServer = ".",
+    [string] $RemoteHost = "",
+    [string] $Auth = "",
+    [string] $AuthPwd  = "",
+    [string] $AuthPwdFile  = "",
     [Parameter(Mandatory=$TRUE, ParameterSetName="csv")] [string] $CsvFile,
     [Parameter(Mandatory=$TRUE, ParameterSetName="excel")] [string] $ExcelFile,
     [Parameter(ParameterSetName="excel")][string] $ExcelSheetName = "Hosts",
@@ -251,6 +255,21 @@ function lookupAndRemoveOldRecords($name, $zone, $type) {
     return $TRUE
 }
 
+# function to cleanly exit (close any open sessions, etc)
+function CleanExit {
+    # is there a $RemoteHost?
+    if ($RemoteHost) {
+        Remove-PSSession $RemoteHost
+    }
+    
+    # remove the DnsServer module, it's possible we remoted this module
+    # doesn't hurt to do this if we're local, it'll just be reloaded automagically if any DnsServer module commands are entered
+    Remove-Module DnsServer
+
+    # bye bye
+    exit
+}
+
 #
 # application begin
 #
@@ -261,6 +280,75 @@ $ErrorActionPreference = 'Stop'
 # don't run if we're not on PS7
 if ($PSVersionTable.PSVersion.Major -lt 7) {
     Write-Error "This script requires PowerShell 7 or higher"
+}
+
+# if $RemoteHost is present, create session on that host
+if ($RemoteHost) {
+    # did we get a user with $Auth?
+    if ($Auth) {
+        # check for $AuthPwd (this takes precedence)
+        if ($AuthPwd -and $AuthPwdFile) {
+            Write-Debug "Using -AuthPwd from arguments instead of -AuthPwdFile."
+        # otherwise, check for $AuthPwdFile
+        } elseif ($AuthPwdFile) {
+            # debug
+            Write-Debug "Reading password from '$AuthPwdFile'."
+            
+            # TODO: CHECK FILE PERMS AND WARN IF GLOBALLY READABLE
+            # TODO: Linux: (Get-ChildItem $AuthPwdFile).UnixMode -match "^.{4}r.*" or "^.{7}r.*"
+            # TODO: Windows: ...... windows file permissions dumb.....
+            
+            # read file
+            $AuthPwd = Get-Content $AuthPwdFile
+        }
+
+        # check if we got an $AuthPwd
+        if ($AuthPwd) {
+            # debug
+            Write-Debug "Converting -AuthPwd to SecureString."
+            
+            # convert password to a secure string
+            $AuthPwdSString = ConvertTo-SecureString $AuthPwd -AsPlainText -Force
+            
+            # set $Auth to a new PSCredential object
+            $AuthPSCred = New-Object System.Management.Automation.PSCredential ($Auth, $AuthPwdSString)
+        }
+        
+        # default to value from -Auth
+        $AuthCred = $Auth
+        
+        # but check if we have an $AuthPSCred and use that instead
+        if ($AuthPSCred) {
+            $AuthCred = $AuthPSCred
+        }
+
+        # TODO: wrap w/ try
+        # create remote session
+        $RemoteSession = New-PSSession -ComputerName $RemoteHost -Authentication Negotiate -Credential $AuthCred
+    # otherwise, check if we're not on windows (!windows needs $Auth)
+    } elseif (-not ($IsWindows)) {
+        Write-Error "-Auth needed if not running on Windows."
+        exit
+    } else {
+        # TODO: wrap w/ try
+        # no need to pass -Authentication Negotiate here, we're on windows and have ntlm
+        $RemoteSession = New-PSSession -ComputerName $RemoteHost
+    }
+    
+    # at this point we should have a $RemoteSession, if not, there's a problem
+    if ($RemoteSession.State -ne "Opened") {
+        Write-Error "Failed creating remote session."
+        exit
+    }
+    
+    # import DnsServer module
+    Import-Module -PSSession $RemoteSession DnsServer
+}
+
+# check for DnsServer module
+if (-not (Get-Module | Where-Object {$_.Name -eq 'DnsServer'})) {
+    Write-Error "DnsServer module not available - try specifying a -RemoteHost with the DnsServer module installed."
+    exit
 }
 
 # test connection to $DnsServer
@@ -450,3 +538,6 @@ $hostAddDelta = $hosts.Count - $addedRecords
 if ($hostAddDelta -gt 0) {
     Write-Warning "$hostAddDelta host(s) were skipped due to problems"
 }
+
+# call function to cleanly exit
+CleanExit

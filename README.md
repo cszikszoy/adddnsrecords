@@ -7,8 +7,10 @@
 | &#x2011;Debug | *[Optional]* Print extra information |
 | &#x2011;DryRun | *[Optional]* Only print destructive (add / delete) commands, don't actually perform them |
 | &#x2011;DnsServer | **[Required]** Target DNS server to add records to |
-| &#x2011;RemoteHost | *[Optional]* Run commands on remote host using [PowerShell Implicit Remoting](https://devblogs.microsoft.com/scripting/remoting-the-implicit-way/) (required if local machine is Linux or doesn't have PS DnsServer module installed)
-| &#x2011;Auth | *[Optional]* Perform commands as a different user (required if run from Linux or current user lacks privileges on the DNS Server) |
+| &#x2011;RemoteHost | *[Optional]* Run commands on remote host using [PowerShell Implicit Remoting](https://devblogs.microsoft.com/scripting/remoting-the-implicit-way/) <br> *Required if local machine is Linux or doesn't have PS DnsServer module installed* |
+| &#x2011;Auth | *[Optional]* Perform commands as a different user <br> *Required if run from Linux or current user lacks privileges on the DNS Server* |
+| &#x2011;AuthPwd | *[Optional]* Password for `&#x2011;Auth` user <br> *Console will prompt if not supplied <br> Takes priority over `&#x2011;AuthPwdFile`* |
+| &#x2011;AuthPwdFile | *[Optional]* File containing password for `&#x2011;Auth` user |
 ### CSV Files
 | Syntax | Description |
 | - | - |
