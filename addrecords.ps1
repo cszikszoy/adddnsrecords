@@ -530,7 +530,7 @@ foreach ($h in $hosts) {
 Write-Host "Added $addedRecords records to DNS"
 
 # calculate delta between hosts we tried to add and hosts we actually added
-$hostAddDelta = $hosts.Count - $addedRecords
+#$hostAddDelta = $hosts.Count - $addedRecords
 
 # was there a delta?
 if ($hostAddDelta -gt 0) {
