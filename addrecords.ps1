@@ -5,7 +5,7 @@
 
 Param(
     [switch] $DryRun,
-    [string] $DnsServer = ".",
+    [string] $DnsServer = "localhost",
     [string] $RemoteHost = "",
     [string] $Auth = "",
     [string] $AuthPwd  = "",
@@ -357,7 +357,7 @@ try {
 } catch {
     Write-Error "Could not connect to '$DnsServer'."
     Write-Error $_
-    if ($DnsServer -ne ".") {
+    if ($DnsServer -ne "localhost") {
         Write-Error "It looks like we're trying to connect to a remote DNS server. Make sure PowerShell Remoting is enabled by running 'Enable-PSRemoting' on the target."
     }
     exit
