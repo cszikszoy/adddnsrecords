@@ -35,13 +35,16 @@ When processing an Excel file for hosts, the script will search for any [named r
 | Host #2 | 2.2.2.2 | host2.te.st| |
 
 ## Linux Notes
-Most (all?) Linux distributions don't support the NTLM authentication protocol without the use of additional packages. 
-### On Ubuntu
+### Install PowerShell
+Follow [Microsoft's documentation](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-linux?view=powershell-7.2) to install PowerShell on Linux.
+### NTLM Authentication
+Most (all?) Linux distributions don't support the NTLM authentication protocol without additional packages. 
+#### On Ubuntu
 This package is in the default repos and can be installed by running the following command:
 ```
 sudo apt install gss-ntlmssp
 ```
-### On RHEL / CentOS / RockyLinux / Other "EL"'s
+#### On RHEL / CentOS / RockyLinux / Other "EL"'s
 Version 7
 ```
 sudo yum -y install epel-release
